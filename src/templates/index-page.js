@@ -6,7 +6,14 @@ import Img from "gatsby-image";
 import Layout from "../components/Layout";
 import "bulma-carousel/dist/css/bulma-carousel.min.css";
 
-import bulmaCarousel from "bulma-carousel";
+// import bulmaCarousel from "bulma-carousel";
+
+// Workaround for bug with bulmaCarousel with Netlify deployment; source: https://github.com/Wikiki/bulma-carousel/issues/76
+const bulmaCarousel = (() => {
+  if (typeof window !== "undefined") {
+    return require("bulma-carousel");
+  }
+})();
 
 class IndexPageTemplate extends Component {
   constructor(props) {
@@ -26,7 +33,9 @@ class IndexPageTemplate extends Component {
     console.log("carouselRef:", this.carouselRef);
     bulmaCarousel.attach(this.carouselRef.current, {
       slidesToScroll: 1,
-      slidesToShow: 1
+      slidesToShow: 1,
+      infinite: true,
+      autoplay: true
     });
   }
 
