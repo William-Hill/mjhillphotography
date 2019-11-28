@@ -1,10 +1,10 @@
 {
-  "name": "gatsby-starter-netlify-cms",
-  "description": "Example Gatsby, and Netlify CMS project",
-  "version": "1.1.3",
-  "author": "Austin Green",
+  "name": "mj-hill-photography",
+  "description": "M.J. Hill Photography website. A part of M.J. Hill Digital.",
+  "version": "2.0.0",
+  "author": "M.J. Hill",
   "dependencies": {
-    "bulma": "^0.7.0",
+    "bulma": "^0.8.0",
     "bulma-carousel": "^4.0.4",
     "gatsby": "^2.1.34",
     "gatsby-image": "^2.0.23",

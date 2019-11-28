@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { Link, graphql } from "gatsby";
+import { graphql } from "gatsby";
 import Img from "gatsby-image";
 
 import Layout from "../components/Layout";
@@ -51,7 +50,7 @@ class IndexPageTemplate extends Component {
             >
               {this.state.photos_fluid.map((photo, i) => {
                 return (
-                  <div className={`item-${i}`}>
+                  <div className={`item-${i}`} key={i}>
                     <Img fluid={photo.node.childImageSharp.fluid} />
                   </div>
                 );

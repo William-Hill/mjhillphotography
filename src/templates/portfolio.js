@@ -86,6 +86,7 @@ class GalleryComposition extends Component {
     super(props);
     const data = props.data;
     const photos = data.allFile.edges;
+    console.log("photos:", photos);
     this.state = {
       photos_fluid: photos
     };
