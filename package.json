@@ -33,8 +33,9 @@
     "react-dom": "^16.8.4",
     "react-helmet": "^5.2.0",
     "react-images": "latest",
+    "react-masonry-css": "^1.0.14",
     "react-responsive-masonry": "latest",
-    "rebass": "latest",
+    "rebass": "3.0.0",
     "styled-components": "latest",
     "uuid": "^3.2.1"
   },
