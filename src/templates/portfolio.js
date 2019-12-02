@@ -1,6 +1,44 @@
+/*eslint no-continue: "error"*/
 import React, { Component, useState, Fragment } from "react";
 import Layout from "../components/Layout";
 import Gallery from "../components/Gallery";
+
+function getCoverPhotos(photos) {
+  let coverPhotos = {};
+  photos.forEach(photo => {
+    let photoDir = photo.node.dir;
+    var album = photoDir.substr(photoDir.lastIndexOf("/") + 1);
+    if (
+      !coverPhotos.hasOwnProperty(album) &&
+      photoDir.includes("portraits") &&
+      photo.node.childImageSharp.fluid.aspectRatio == 1.5
+    ) {
+      coverPhotos[album] = [photo.node.childImageSharp];
+    }
+  });
+  return coverPhotos;
+}
+
+function getPhotoAlbums(photos) {
+  let portraits = {};
+  let events = {};
+  photos.forEach(photo => {
+    let photoDir = photo.node.dir;
+    var album = photoDir.substr(photoDir.lastIndexOf("/") + 1);
+    if (photoDir.includes("portraits")) {
+      // portraitAlbums.add(album);
+      if (portraits.hasOwnProperty(album)) {
+        portraits[album].push(photo.node.childImageSharp);
+      } else {
+        portraits[album] = [photo.node.childImageSharp];
+      }
+    } else {
+      events.add(album);
+    }
+  });
+
+  return [portraits, events];
+}
 
 class GalleryComposition extends Component {
   constructor(props) {
@@ -9,27 +47,17 @@ class GalleryComposition extends Component {
     const photos = data.allFile.edges;
     console.log("photos:", photos);
     // let portraitAlbums = new Set();
-    let portraitAlbums = {};
-    let eventAlbums = new Set();
-    photos.forEach(photo => {
-      let photoDir = photo.node.dir;
-      var album = photoDir.substr(photoDir.lastIndexOf("/") + 1);
-      if (photoDir.includes("portraits")) {
-        // portraitAlbums.add(album);
-        if (portraitAlbums.hasOwnProperty(album)) {
-          portraitAlbums[album].push(photo.node.childImageSharp);
-        } else {
-          portraitAlbums[album] = [photo.node.childImageSharp];
-        }
-      } else {
-        eventAlbums.add(album);
-      }
-    });
+    let [portraitAlbums, eventAlbums] = getPhotoAlbums(photos);
+    let portraitCoverPhotos = getCoverPhotos(photos);
+
+    console.log("portraitCoverPhotos:", portraitCoverPhotos);
+
     console.log("portraitAlbums:", portraitAlbums);
     this.state = {
       photos_fluid: photos,
       portraitAlbums: portraitAlbums,
-      eventAlbums: Array.from(eventAlbums)
+      eventAlbums: Array.from(eventAlbums),
+      coverPhotos: portraitCoverPhotos
     };
   }
 
@@ -69,15 +97,32 @@ class GalleryComposition extends Component {
               }))}
             />
             <Fragment>
-              <div class="card">
-                <div class="card-image">
-                  <figure class="image is-4by3">
-                    <img
-                      src="https://bulma.io/images/placeholders/1280x960.png"
-                      alt="Placeholder image"
-                    />
-                  </figure>
-                </div>
+              <div className="columns is-multiline">
+                {Object.keys(this.state.coverPhotos).map((coverPhoto, i) => {
+                  console.log(
+                    "coverPhoto:",
+                    this.state.coverPhotos[coverPhoto]
+                  );
+                  return (
+                    <Fragment>
+                      <div className="column is-one-third thumbnail-column">
+                        <div
+                          className="thumbnail"
+                          style={{
+                            backgroundImage: `url(${
+                              this.state.coverPhotos[coverPhoto][0].fluid.src
+                            })`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center center",
+                            backgroundRepeat: "no-repeat"
+                          }}
+                        >
+                          <header class="thumbnail-header">Placeholder</header>
+                        </div>
+                      </div>
+                    </Fragment>
+                  );
+                })}
               </div>
             </Fragment>
           </div>
