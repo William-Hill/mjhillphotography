@@ -17,7 +17,8 @@
 }
 
 .thumbnail-column {
-  height: 200px;
+  /* height: 200px; */
+  height: 50vh;
   overflow: hidden;
   padding: 0;
 }

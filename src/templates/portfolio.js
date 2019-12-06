@@ -43,52 +43,41 @@ function getPhotoAlbums(photos) {
 class GalleryComposition extends Component {
   constructor(props) {
     super(props);
+    console.log("props:", props);
     const data = props.data;
-    const photos = data.allFile.edges;
+    let pageInfo = data.allPageInfo;
+    let imageInfo = data.allImageInfo;
+    // const photos = data.markdownRemark.frontmatter.imagepaths;
+    const photos = imageInfo.edges.filter(
+      x => x.node.relativeDirectory === pageInfo.frontmatter.directory
+    );
     console.log("photos:", photos);
     // let portraitAlbums = new Set();
-    let [portraitAlbums, eventAlbums] = getPhotoAlbums(photos);
-    let portraitCoverPhotos = getCoverPhotos(photos);
+    // let [portraitAlbums, eventAlbums] = getPhotoAlbums(photos);
+    // let portraitCoverPhotos = getCoverPhotos(photos);
 
-    console.log("portraitCoverPhotos:", portraitCoverPhotos);
+    // console.log("portraitCoverPhotos:", portraitCoverPhotos);
 
-    console.log("portraitAlbums:", portraitAlbums);
+    // console.log("portraitAlbums:", portraitAlbums);
     this.state = {
       photos_fluid: photos,
-      portraitAlbums: portraitAlbums,
-      eventAlbums: Array.from(eventAlbums),
-      coverPhotos: portraitCoverPhotos
+      title: pageInfo.frontmatter.title,
+      description: pageInfo.frontmatter.description
+      // portraitAlbums: portraitAlbums,
+      // eventAlbums: Array.from(eventAlbums),
+      // coverPhotos: portraitCoverPhotos
     };
+    console.log("this.state:", this.state);
   }
 
   render() {
     return (
       <Layout>
+        <div className="content has-text-centered">
+          <h2>{this.state.title}</h2>
+          <p>{this.state.description}</p>
+        </div>
         <div className="columns">
-          <aside className="column is-2 is-narrow-mobile is-fullheight section is-hidden-mobile portfolio-menu">
-            <p className="menu-label">Portraits</p>
-            <ul className="menu-list">
-              {Object.keys(this.state.portraitAlbums).map((album, i) => {
-                console.log("album:", album);
-                return (
-                  <li key={`${album}_${i}`}>
-                    <a>{album}</a>
-                  </li>
-                );
-              })}
-            </ul>
-            <p className="menu-label">Events</p>
-            <ul className="menu-list">
-              {this.state.eventAlbums.map((album, i) => {
-                console.log("album:", album);
-                return (
-                  <li>
-                    <a>{album}</a>
-                  </li>
-                );
-              })}
-            </ul>
-          </aside>
           <div className="column">
             <Gallery
               itemsPerRow={[2, 3]} // This will be changed to `[2, 3]` later
@@ -96,35 +85,6 @@ class GalleryComposition extends Component {
                 ...node.childImageSharp.fluid
               }))}
             />
-            <Fragment>
-              <div className="columns is-multiline">
-                {Object.keys(this.state.coverPhotos).map((coverPhoto, i) => {
-                  console.log(
-                    "coverPhoto:",
-                    this.state.coverPhotos[coverPhoto]
-                  );
-                  return (
-                    <Fragment>
-                      <div className="column is-one-third thumbnail-column">
-                        <div
-                          className="thumbnail"
-                          style={{
-                            backgroundImage: `url(${
-                              this.state.coverPhotos[coverPhoto][0].fluid.src
-                            })`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center center",
-                            backgroundRepeat: "no-repeat"
-                          }}
-                        >
-                          <header class="thumbnail-header">Placeholder</header>
-                        </div>
-                      </div>
-                    </Fragment>
-                  );
-                })}
-              </div>
-            </Fragment>
           </div>
         </div>
       </Layout>
@@ -134,13 +94,27 @@ class GalleryComposition extends Component {
 
 export default GalleryComposition;
 
-export const portfolioPageQuery = graphql`
-  query PortfolioQuery {
-    allFile(filter: { sourceInstanceName: { eq: "portfolio" } }) {
+export const pageQuery = graphql`
+  query PortfolioQueryByID($id: String!) {
+    allPageInfo: markdownRemark(id: { eq: $id }) {
+      id
+      html
+      frontmatter {
+        date(formatString: "MMMM DD, YYYY")
+        title
+        description
+        tags
+        directory
+      }
+    }
+    allImageInfo: allFile(filter: { sourceInstanceName: { eq: "portfolio" } }) {
       edges {
         node {
           absolutePath
+          relativePath
+          relativeDirectory
           extension
+          base
           size
           dir
           modifiedTime
@@ -155,3 +129,25 @@ export const portfolioPageQuery = graphql`
     }
   }
 `;
+
+// export const portfolioPageQuery = graphql`
+//   query PortfolioQuery {
+//     allFile(filter: { sourceInstanceName: { eq: "portfolio" } }) {
+//       edges {
+//         node {
+//           absolutePath
+//           extension
+//           size
+//           dir
+//           modifiedTime
+//           childImageSharp {
+//             fluid {
+//               ...GatsbyImageSharpFluid
+//               sizes
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// `;
